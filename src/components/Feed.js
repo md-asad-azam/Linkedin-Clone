@@ -6,39 +6,47 @@ import ImageIcon from '@mui/icons-material/Image';
 import CalendarViewDayIcon from '@mui/icons-material/CalendarViewDay';
 import EventNoteIcon from '@mui/icons-material/EventNote';
 import Post from './Post';
-import { db } from '../fireBase';
+import { db } from "../firebase"
+import { onSnapshot, collection, addDoc, serverTimestamp, query, orderBy } from 'firebase/firestore';
 
 export default function Feed() {
     const [input, setInput] = useState("")
     const [posts, setPosts] = useState([])
 
     useEffect(() => {
-        db.collection("posts").onSnapshot(snapshot => (
-            setPosts(snapshot.docs.map((doc) => (
-                {
-                    id: doc.id,
-                    data: doc.data
-                }
-            )))
-        ))
+        const collectionRef = collection(db, "posts")
+        const q = query(collectionRef, orderBy("timestamp", "desc"))
+
+        const unSub = onSnapshot(q, (snapshot) => {
+            setPosts(snapshot.docs.map((doc) => ({
+                id: doc.id,
+                data: doc.data()
+            })))
+        })
+        return unSub
     }, [])
 
-    const sendPost = (e) => {
+    const sendPost = async (e) => {
         e.preventDefault();
-        db.collection("posts").add({
-            name: "asdfghjk",
-            description: "this is sfgl;",
+        await addDoc(collection(db, "posts"), {
+            name: "Alan",
             message: input,
-            imgUrl: ""
-        })
+            description: "Turing",
+            imgUrl: "1912",
+            timestamp: serverTimestamp()
+        });
+
+        setInput("")
     }
+
+
 
     return (
         <div className="feed">
             <div className="feed_inputContainer">
                 <div className="feed_input">
                     <form>
-                        <input type="text" onChange={e => setInput(e.target.value)} placeholder="Start a post" />
+                        <input value={input} type="text" onChange={e => setInput(e.target.value)} placeholder="Start a post" />
                         <button onClick={sendPost} type="submit">Send</button>
                     </form>
                 </div>
@@ -52,15 +60,15 @@ export default function Feed() {
 
             {/* =====================POSTS================= */}
 
-            {posts.map((post) => (
-                <Post />
+            {posts.map(({ id, data: { name, message, description, imgUrl } }) => (
+                <Post
+                    key={id}
+                    name={name}
+                    message={message}
+                    description={description}
+                    imgUrl={imgUrl}
+                />
             ))}
-            
-            <Post
-            name="Asad" 
-            message="hello" 
-            description="test"
-            imgUrl="https://www.industrialempathy.com/img/remote/ZiClJf-1280w.avif"/>
         </div>
     )
 }
