@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react'
 import "./Feed.css"
+import React, { useEffect, useState } from 'react'
 import InputOption from './InputOption';
 import SubscriptionsIcon from '@mui/icons-material/Subscriptions';
 import ImageIcon from '@mui/icons-material/Image';
@@ -8,8 +8,13 @@ import EventNoteIcon from '@mui/icons-material/EventNote';
 import Post from './Post';
 import { db } from "../firebase"
 import { onSnapshot, collection, addDoc, serverTimestamp, query, orderBy } from 'firebase/firestore';
+import { useSelector } from 'react-redux';
+import { selectUser } from '../features/counter/userSlice';
+import FlipMove from "react-flip-move";
 
 export default function Feed() {
+    const user = useSelector(selectUser)
+
     const [input, setInput] = useState("")
     const [posts, setPosts] = useState([])
 
@@ -29,10 +34,10 @@ export default function Feed() {
     const sendPost = async (e) => {
         e.preventDefault();
         await addDoc(collection(db, "posts"), {
-            name: "Alan",
+            name: user.displayName,
             message: input,
-            description: "Turing",
-            imgUrl: "1912",
+            description: user.email,
+            imgUrl: user.photoUrl || "",
             timestamp: serverTimestamp()
         });
 
@@ -60,15 +65,17 @@ export default function Feed() {
 
             {/* =====================POSTS================= */}
 
-            {posts.map(({ id, data: { name, message, description, imgUrl } }) => (
-                <Post
-                    key={id}
-                    name={name}
-                    message={message}
-                    description={description}
-                    imgUrl={imgUrl}
-                />
-            ))}
+            <FlipMove>
+                {posts.map(({ id, data: { name, message, description, imgUrl } }) => (
+                    <Post
+                        key={id}
+                        name={name}
+                        message={message}
+                        description={description}
+                        imgUrl={imgUrl}
+                    />
+                ))}
+            </FlipMove>
         </div>
     )
 }
