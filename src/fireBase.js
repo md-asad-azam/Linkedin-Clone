@@ -1,4 +1,5 @@
 // Import the functions you need from the SDKs you need
+import { getAuth } from "@firebase/auth";
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore"
 // TODO: Add SDKs for Firebase products that you want to use
@@ -15,8 +16,10 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
+// /* eslint-disable no-unused-vars */
 const app = initializeApp(firebaseConfig);
 
 const db = getFirestore()
+const auth = getAuth()
 
-export { db }
+export { db, auth }
