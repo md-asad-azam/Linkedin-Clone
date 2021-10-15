@@ -19,7 +19,7 @@ export default function Sidebar() {
             <div className="sidebar_top">
                 <img src="https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_1280.jpg" alt="" />
 
-                <Avatar src={user.photoUrl} className="sidebar_avatar" >{user.displayName[0]}</Avatar>
+                <Avatar src={user.photoUrl || ""} className="sidebar_avatar" >{user.displayName[0]}</Avatar>
                 <h2>{user.displayName}</h2>
                 <h4>{user.email}</h4>
 
